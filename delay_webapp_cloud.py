@@ -94,14 +94,17 @@ def get_config():
 
     # Streamlit Secrets에서 가져오기 (Cloud 배포용)
     try:
-        if "gcp_service_account" in st.secrets:
+        # gcp_service_account 섹션 확인
+        if hasattr(st, 'secrets') and "gcp_service_account" in st.secrets:
             config["credentials"] = dict(st.secrets["gcp_service_account"])
-        if "spreadsheet_key" in st.secrets:
+
+        # spreadsheet_key 확인
+        if hasattr(st, 'secrets') and "spreadsheet_key" in st.secrets:
             config["spreadsheet_key"] = st.secrets["spreadsheet_key"]
-    except:
+    except Exception:
         pass
 
-    # 세션에서 가져오기 (사용자 입력)
+    # 세션에서 가져오기 (사용자 입력 - 로컬 실행용)
     if "credentials" not in config and "user_credentials" in st.session_state:
         config["credentials"] = st.session_state["user_credentials"]
     if "spreadsheet_key" not in config and "user_spreadsheet_key" in st.session_state:
@@ -515,11 +518,13 @@ def main():
     config = get_config()
 
     # 설정이 완료되었는지 확인
-    config_complete = st.session_state.get("config_complete", False)
     has_credentials = "credentials" in config
     has_spreadsheet = "spreadsheet_key" in config
 
-    if config_complete and has_credentials and has_spreadsheet:
+    # Secrets에서 설정이 로드되었으면 자동으로 메인 앱으로 이동
+    if has_credentials and has_spreadsheet:
+        main_app()
+    elif st.session_state.get("config_complete", False):
         main_app()
     else:
         show_settings_page()
