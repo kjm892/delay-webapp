@@ -284,16 +284,11 @@ def check_order_in_market(market: Dict, product_order_id: str) -> Optional[Dict]
 
 def find_order_parallel(markets: List[Dict], product_order_id: str) -> Optional[Dict]:
     """병렬로 모든 마켓에서 주문 찾기"""
-    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        futures = {
-            executor.submit(check_order_in_market, market, product_order_id): market
-            for market in markets
-        }
-
-        for future in as_completed(futures):
-            result = future.result()
-            if result:
-                return result
+    # 순차 처리로 변경 (Streamlit Cloud 호환성)
+    for market in markets:
+        result = check_order_in_market(market, product_order_id)
+        if result:
+            return result
     return None
 
 
