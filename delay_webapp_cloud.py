@@ -308,7 +308,7 @@ def get_delay_reason_code(delay_reason: str) -> str:
     - OVERSEA_DELIVERY: 해외배송
     - CUSTOMER_REQUEST: 고객요청
     """
-    if "해외" in delay_reason or "현지" in delay_reason:
+    if "해외" in delay_reason or "현지" in delay_reason or "배송중" in delay_reason:
         return "OVERSEA_DELIVERY"
     elif "주문제작" in delay_reason or "제작" in delay_reason:
         return "CUSTOM_BUILD"
@@ -417,6 +417,7 @@ def main_app():
             options=[
                 "해외배송으로 인한 지연",
                 "현지 배송 중입니다",
+                "배송중입니다",
                 "상품준비 중",
                 "주문제작으로 인한 지연",
                 "예약발송",
